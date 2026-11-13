@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>校闪送 - 校园点餐配送平台</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:#eef0f3;color:#222;font-size:15px;}
+#app{max-width:500px;margin:0 auto;min-height:100vh;background:#f2f4f7;padding-bottom:78px;position:relative;}
+
+/* ---------- 顶栏 ---------- */
+.topbar{background:linear-gradient(135deg,#ff8a00,#ff5000);color:#fff;padding:13px 16px;
+  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:60;
+  box-shadow:0 3px 12px rgba(255,80,0,.25);}
+.logo{font-size:19px;font-weight:800;letter-spacing:1px;line-height:1.15;}
+.logo small{display:block;font-size:10.5px;font-weight:400;opacity:.92;letter-spacing:0;margin-top:2px;}
+.svc{background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.55);color:#fff;
+  text-decoration:none;font-size:12px;padding:7px 11px;border-radius:20px;white-space:nowrap;}
+
+/* ---------- 通用 ---------- */
+.card{background:#fff;border-radius:14px;margin:10px;padding:14px;box-shadow:0 1px 5px rgba(0,0,0,.05);}
+.sec-title{font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.muted{color:#8a8a8a;font-size:13px;line-height:1.6;margin:6px 0;}
+.center{text-align:center;}
+.price{color:#ff5000;font-weight:800;}
+.link{color:#ff5000;text-decoration:none;font-weight:700;}
+.row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;color:#555;}
+.row span:last-child{color:#222;font-weight:600;}
+.row.total{border-top:1px dashed #eee;margin-top:6px;padding-top:10px;font-size:15px;}
+.row.total span:last-child{font-size:17px;}
+.btn{background:linear-gradient(135deg,#ff8a00,#ff5000);color:#fff;border:none;border-radius:24px;
+  padding:12px 20px;font-size:15px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;
+  box-shadow:0 3px 10px rgba(255,80,0,.28);transition:.15s;}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.45;box-shadow:none;}
+.btn-sm{padding:7px 15px;font-size:13px;border-radius:18px;width:auto;box-shadow:none;}
+.btn-ghost{background:#fff;color:#ff5000;border:1.5px solid #ff5000;box-shadow:none;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;}
+.field input,.field select{width:100%;border:1px solid #e3e3e3;border-radius:11px;padding:12px;
+  font-size:15px;outline:none;background:#fafafa;font-family:inherit;color:#222;}
+.field input:focus{border-color:#ff8a00;background:#fff;}
+.alert{padding:10px 12px;border-radius:10px;font-size:13.5px;margin:10px 0;background:#f5f5f5;color:#555;}
+.alert.ok{background:#e6f7ec;color:#18a058;}
+.alert.warn{background:#fff4e0;color:#d98200;}
+.alert.bad{background:#ffeaea;color:#e34d4d;}
+
+/* ---------- 导航 ---------- */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;height:60px;
+  background:#fff;border-top:1px solid #e8e8e8;display:flex;z-index:100;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:11px;color:#999;gap:3px;cursor:pointer;}
+.nav-item.active{color:#ff5000;font-weight:700;}
+.nav-item .ic{font-size:20px;line-height:1;}
+
+/* ---------- 登录/注册 ---------- */
+.reg-hero{background:linear-gradient(160deg,#ff8a00,#ff5000);color:#fff;padding:40px 20px 35px;
+  text-align:center;border-radius:0 0 26px 26px;}
+.reg-logo{font-size:52px;line-height:1;margin-bottom:10px;}
+.reg-hero h1{margin:0;font-size:26px;letter-spacing:3px;}
+.reg-hero p{margin:8px 0 0;font-size:13px;opacity:.92;}
+.reg-tip{text-align:center;color:#999;font-size:12.5px;padding-bottom:20px;}
+
+.auth-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid #eee;}
+.auth-tab{flex:1;text-align:center;padding:10px 0;font-size:16px;font-weight:700;color:#666;cursor:pointer;position:relative;}
+.auth-tab.active{color:#ff5000;}
+.auth-tab.active::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:40%;height:3px;background:#ff5000;border-radius:3px 3px 0 0;}
+
+/* ---------- 首页点餐 ---------- */
+.hero{background:linear-gradient(135deg,#ff8a00,#ff5000);color:#fff;padding:16px;margin:10px;
+  border-radius:14px;box-shadow:0 4px 14px rgba(255,90,0,.25);}
+.hero-hi{font-size:18px;font-weight:800;}
+.hero-sub{font-size:13px;opacity:.9;margin-top:4px;}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{border:1.5px solid #e6e6e6;background:#fafafa;border-radius:14px;padding:10px 12px;
+  font-size:13.5px;cursor:pointer;color:#555;line-height:1.35;text-align:center;flex:1;min-width:46%;}
+.chip small{display:block;font-size:11px;opacity:.85;margin-top:3px;}
+.chip.active{border-color:#ff5000;color:#ff5000;background:#fff2ea;font-weight:700;}
+
+/* ---------- 购物车栏 ---------- */
+.cartbar{position:fixed;bottom:66px;left:50%;transform:translateX(-50%);width:100%;max-width:500px;
+  padding:0 14px 8px;z-index:90;}
+.cartbar-inner{background:#2c2c2c;border-radius:16px;padding:11px 14px;display:flex;
+  align-items:center;justify-content:space-between;color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.28);font-size:14px;}
+.cart-num{display:inline-block;background:#ff5000;border-radius:9px;padding:1px 7px;font-size:12px;margin-right:4px;font-weight:700;}
+
+/* ---------- 支付UI组件 ---------- */
+.pay-card-mock{background:#fff;border-radius:16px;overflow:hidden;margin:16px 0;box-shadow:0 4px 15px rgba(0,0,0,.08);position:relative;}
+.mock-wx{background:#07c160;color:#fff;padding:20px;text-align:center;}
+.mock-wx .title{font-size:22px;font-weight:800;letter-spacing:1px;}
+.mock-body{background:#fff;padding:25px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.qr-container{background:#fff;padding:10px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);width:200px;height:200px;display:flex;justify-content:center;align-items:center;}
+
+/* ---------- 订单卡片 ---------- */
+.order-card{background:#fff;border-radius:14px;margin-bottom:12px;padding:13px;
+  box-shadow:0 1px 5px rgba(0,0,0,.05);border:1px solid #f2f2f2;}
+.oc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.oc-id{font-size:12px;color:#999;font-weight:600;letter-spacing:.5px;}
+.badge{padding:3px 10px;border-radius:11px;font-size:11px;font-weight:700;}
+.badge.warn{background:#fff4e0;color:#e8890c;}
+.badge.info{background:#e8f1ff;color:#2b7fff;}
+.badge.primary{background:#ffece2;color:#ff5000;}
+.badge.ok{background:#e6f7ec;color:#18a058;}
+.badge.bad{background:#ffeaea;color:#e34d4d;}
+.oc-actions{display:flex;gap:10px;margin-top:10px;}
+.oc-actions .btn{flex:1;}
+
+/* ---------- 我的 ---------- */
+.profile{background:linear-gradient(135deg,#ff8a00,#ff5000);color:#fff;margin:10px;border-radius:16px;
+  padding:20px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 5px 16px rgba(255,90,0,.28);}
+.avatar{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.28);
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;
+  border:2px solid rgba(255,255,255,.6);flex-shrink:0;}
+.pname{font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.tag-member{background:#ffd54d;color:#7a4b00;font-size:11px;padding:2px 8px;border-radius:9px;font-weight:800;}
+.pphone{font-size:13px;opacity:.95;margin-top:5px;}
+.pclass{font-size:12px;opacity:.85;margin-top:3px;}
+.menu-list{padding:4px 14px;}
+.ml-item{display:flex;justify-content:space-between;align-items:center;padding:15px 0;
+  border-bottom:1px solid #f4f4f4;font-size:14.5px;cursor:pointer;}
+.ml-item:last-child{border-bottom:none;}
+.ml-r{color:#bbb;font-size:13px;}
+
+/* ---------- 中控 ---------- */
+.admin-head{font-size:16px;font-weight:800;display:flex;justify-content:space-between;align-items:center;}
+.tabs{display:flex;gap:8px;padding:0 10px;margin-bottom:6px;overflow-x:auto;}
+.tab{padding:9px 14px;background:#fff;border-radius:20px;font-size:13px;color:#666;
+  white-space:nowrap;cursor:pointer;border:1.5px solid transparent;font-weight:600;}
+.tab.active{background:#fff2ea;color:#ff5000;border-color:#ff5000;}
+.member-card{background:linear-gradient(135deg,#2b2b2b,#4a3a2a);color:#ffd97a;border-radius:14px;
+  padding:18px;margin:10px 0;}
+.mc-title{font-size:17px;font-weight:800;letter-spacing:1px;}
+.mc-list{list-style:none;padding:10px 0 0;margin:0;font-size:13px;line-height:2;color:#ffe9b8;}
+
+/* 客服微信 */
+.wx-group{background:#f7f7f7;border-radius:16px;padding:20px;text-align:center;margin-top:10px;}
+.wx-group .group-avatar{width:64px;height:64px;border-radius:8px;background:#fff;margin:0 auto 15px auto;display:flex;flex-wrap:wrap;padding:4px;gap:2px;justify-content:center;align-content:center;border:1px solid #eee;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+.wx-group .group-avatar span{width:28px;height:28px;background:#ccc;border-radius:4px;display:inline-block;font-size:16px;line-height:28px;}
+.wx-group .group-qr{margin:0 auto;width:200px;height:200px;background:#fff;border-radius:12px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;justify-content:center;align-items:center;}
+
+.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(0,0,0,.82);
+  color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;
+  pointer-events:none;transition:.22s;max-width:80%;text-align:center;}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =========================================================
+   数据层
+========================================================= */
+const LS_KEY = 'xsc_v8';
+const DEPTS = ['机电系','艺术系','经贸系','信息系'];
+const CANTEENS = ['西大2楼', '西大1楼', '西小食堂', '东食堂'];
+const STATUS = {
+  pending_review:{t:'待中控审核',c:'warn'},
+  approved:{t:'待接单',c:'info'},
+  delivering:{t:'配送中',c:'primary'},
+  done:{t:'已完成',c:'ok'},
+  rejected:{t:'审核未通过',c:'bad'}
+};
+
+function defaultData(){
+  return {
+    siteName:'校闪送',
+    servicePhone:'19295283213',
+    adminPwd:'94672',
+    courierPwd:'123456',
+    prices:{'机电系':1,'艺术系':2,'经贸系':2,'信息系':2.5},
+    users:[], currentPhone:'',
+    orders:[], couriers:[],
+    courierSession:null
+  };
+}
+function loadData(){
+  try{ const s=localStorage.getItem(LS_KEY); if(s){ const d=JSON.parse(s); return Object.assign(defaultData(),d);} }catch(e){}
+  return defaultData();
+}
+let D = loadData();
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(D)); }catch(e){} }
+
+const ui = { 
+  view:'home', 
+  authMode:'login', 
+  dept:'机电系', 
+  canteen:'西大2楼',
+  foodName:'',
+  foodPrice:'',
+  adminAuthed:false, 
+  adminTab:'review', 
+  draft:null 
+};
+
+/* =========================================================
+   工具
+========================================================= */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function cur(){ return D.users.find(u=>u.phone===D.currentPhone) || null; }
+function toast(msg){
+  let el=document.getElementById('xsc-toast');
+  if(!el){ el=document.createElement('div'); el.id='xsc-toast'; el.className='toast'; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),1800);
+}
+function val(id){ const e=document.getElementById(id); return e? e.value.trim() : ''; }
+function money(n){ return '¥'+Number(n||0).toFixed(2); }
+
+/* =========================================================
+   渲染
+========================================================= */
+function render(){
+  const app=document.getElementById('app');
+  const u=cur();
+  if(!u){ app.innerHTML = viewAuth(); return; }
+  let body='';
+  switch(ui.view){
+    case 'home':          body=viewHome(); break;
+    case 'express':       body=viewExpress(); break;
+    case 'checkout':      body=viewCheckout(); break;
+    case 'orders':        body=viewOrders(); break;
+    case 'me':            body=viewMe(); break;
+    case 'courierApply':  body=viewCourierApply(); break;
+    case 'courierWork':   body=viewCourierWork(); break;
+    case 'memberApply':   body=viewMemberApply(); break;
+    case 'admin':         body=viewAdmin(); break;
+    default:              body=viewHome();
+  }
+  app.innerHTML = topbar() + body + bottomNav();
+}
+
+function topbar(){
+  return `<div class="topbar">
+    <div class="logo">${esc(D.siteName)}<small>校园点餐 · 快递代取 · 极速配送</small></div>
+    <a class="svc" href="tel:${esc(D.servicePhone)}">📞 ${esc(D.servicePhone)}</a>
+  </div>`;
+}
+function bottomNav(){
+  const items=[['home','🍱','点餐'],['express','📦','快递'],['orders','📋','订单'],['me','👤','我的']];
+  return `<div class="nav">${items.map(([k,ic,t])=>
+    `<div class="nav-item ${ui.view===k?'active':''}" data-act="go" data-view="${k}">
+      <span class="ic">${ic}</span><span>${t}</span></div>`).join('')}</div>`;
+}
+
+/* ---------------- 登录 / 注册 ---------------- */
+function viewAuth(){
+  return `
+  <div class="reg-hero">
+    <div class="reg-logo">🛵</div>
+    <h1>${esc(D.siteName)}</h1>
+    <p>校园点餐 · 快递代取 · 一站式配送</p>
+  </div>
+  <div class="card" style="margin-top:-22px;position:relative;z-index:5;">
+    
+    <div class="auth-tabs">
+      <div class="auth-tab ${ui.authMode==='login'?'active':''}" data-act="switch-auth" data-mode="login">直接登录</div>
+      <div class="auth-tab ${ui.authMode==='register'?'active':''}" data-act="switch-auth" data-mode="register">注册新账号</div>
+    </div>
+
+    ${ui.authMode === 'login' ? `
+      <div class="field">
+        <label>手机号码</label>
+        <input id="l-phone" type="tel" maxlength="11" placeholder="请输入已注册的11位手机号">
+      </div>
+      <button class="btn" data-act="login">立即登录</button>
+    ` : `
+      <div class="field"><label>手机号码 *</label><input id="r-phone" type="tel" maxlength="11" placeholder="请输入11位手机号"></div>
+      <div class="field"><label>姓名 *</label><input id="r-name" placeholder="请输入真实姓名"></div>
+      <div class="field"><label>年龄 *</label><input id="r-age" type="number" placeholder="请输入年龄"></div>
+      <div class="field"><label>班级 *</label><input id="r-class" placeholder="如：机电2101"></div>
+      <button class="btn" data-act="register">注册并登录</button>
+    `}
+    
+  </div>
+  <p class="reg-tip">客服电话：${esc(D.servicePhone)}</p>`;
+}
+
+/* ---------------- 首页点餐 ---------------- */
+function viewHome(){
+  const u=cur();
+  const baseFee = D.prices[ui.dept] ?? 2;
+  const fee = u.member ? baseFee / 2 : baseFee;
+  const fp = parseFloat(ui.foodPrice) || 0;
+  const total = fp + fee;
+
+  return `
+  <div class="hero">
+    <div class="hero-hi">Hi, ${esc(u.name)} 👋</div>
+    <div class="hero-sub">请选择食堂并填写具体菜品及价格，下单后等待中控审核</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">🍱 选择取餐食堂</div>
+    <div class="chips" style="gap:10px;">
+      ${CANTEENS.map(c=>`<div class="chip ${ui.canteen===c?'active':''}" data-act="setcanteen" data-canteen="${c}">
+        ${c}
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">🍲 填写饭名/菜品</div>
+    <div class="field" style="margin-bottom:0;">
+      <input id="food-name" type="text" value="${esc(ui.foodName)}" 
+             placeholder="请填写您点的是什么饭（如：黄焖鸡米饭）" data-act="input-name" style="font-size:16px;">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">💰 填写饭盒总价</div>
+    <div class="field" style="margin-bottom:0;">
+      <input id="food-price" type="number" step="0.01" min="0" value="${esc(ui.foodPrice)}" 
+             placeholder="请输入饭钱（元）" data-act="input-price" style="font-size:20px;font-weight:700;color:#ff5000;">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">📍 选择送达院系</div>
+    <div class="chips">
+      ${DEPTS.map(d=>`<div class="chip ${ui.dept===d?'active':''}" data-act="setdept" data-dept="${d}">
+        ${d}<small>配送 ¥${D.prices[d]}${u.member ? ' (会员减半)' : ''}</small></div>`).join('')}
+    </div>
+  </div>
+
+  ${fp > 0 ? `<div class="cartbar"><div class="cartbar-inner">
+      <div>饭钱 <b>${money(fp)}</b> <span style="opacity:.65;font-size:12px;"> + 配送${money(fee)}</span></div>
+      <button class="btn btn-sm" data-act="tocheckout">去支付 ${money(total)}</button>
+    </div></div>` : ''}`;
+}
+
+/* ---------------- 快递代取 ---------------- */
+function viewExpress(){
+  const u=cur();
+  const baseFee = D.prices[ui.dept] ?? 2;
+  const fee = u.member ? baseFee / 2 : baseFee;
+  
+  return `
+  <div class="card">
+    <div class="sec-title">📦 快递代取</div>
+    <p class="muted">填写取件信息，配送员帮您把快递送到手上，配送价格与送餐相同。</p>
+
+    <div class="field"><label>取件码 / 手机尾号 *</label>
+      <input id="ex-code" placeholder="如：8-3-2088 或 手机尾号8888"></div>
+    <div class="field"><label>快递点 / 备注</label>
+      <input id="ex-note" placeholder="如：菜鸟驿站（东门）"></div>
+
+    <div class="sec-title" style="margin-top:16px">📍 选择送达院系</div>
+    <div class="chips">
+      ${DEPTS.map(d=>`<div class="chip ${ui.dept===d?'active':''}" data-act="setdept" data-dept="${d}">
+        ${d}<small>配送 ¥${D.prices[d]}${u.member ? ' (会员减半)' : ''}</small></div>`).join('')}
+    </div>
+
+    <div class="row total" style="margin-top:14px">
+      <span>配送费${u.member ? ' (会员减半)' : ''}</span>
+      <span class="price">${money(fee)}</span>
+    </div>
+    <button class="btn" style="margin-top:12px" data-act="express-submit">去支付 ${money(fee)}</button>
+  </div>`;
+}
+
+/* ---------------- 付款页面 ---------------- */
+function viewCheckout(){
+  const d=ui.draft;
+  if(!d){
+    return `<div class="card"><p class="muted center">暂无待支付订单</p>
+      <button class="btn" data-act="go" data-view="home">返回首页</button></div>`;
+  }
+  
+  const qrHtml = `
+    <div class="pay-card-mock">
+      <div class="mock-wx">
+        <div class="title">微信支付</div>
+      </div>
+      <div class="mock-body">
+        <div class="qr-container">
+          <img src="wechat.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" alt="微信收款码">
+        </div>
+      </div>
+    </div>`;
+
+  return `
+  <div class="card">
+    <div class="sec-title">🧾 订单确认</div>
+    ${d.type==='food'
+      ? `<div class="row"><span>取餐食堂</span><span>${esc(d.canteen)}</span></div>
+         <div class="row"><span>饭名</span><span>${esc(d.foodName)}</span></div>
+         <div class="row"><span>饭盒总价</span><span>${money(d.foodFee)}</span></div>`
+      : `<div class="row"><span>快递代取</span><span>取件码/尾号：${esc(d.code)}</span></div>
+         ${d.note?`<div class="row"><span>备注</span><span>${esc(d.note)}</span></div>`:''}`}
+    <div class="row"><span>送达院系</span><span>${esc(d.dept)}</span></div>
+    <div class="row"><span>配送费</span><span>${money(d.deliveryFee)}</span></div>
+    <div class="row total"><span>应付合计</span><span class="price">${money(d.total)}</span></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">💳 扫码支付</div>
+    ${qrHtml}
+    
+    <p class="muted center" style="color:#d98200;background:#fff4e0;padding:10px;border-radius:10px;">
+      ⚠️ 付款完成后，请点击下方按钮提交审核。<br>中控管理员审核通过后，配送员才会接单。
+    </p>
+    <button class="btn" style="margin-top:16px" data-act="paid">我已付款，提交审核</button>
+  </div>`;
+}
+
+/* ---------------- 我的订单 ---------------- */
+function viewOrders(){
+  const u=cur();
+  const list = D.orders.filter(o=>o.phone===u.phone).sort((a,b)=>b.createdAt-a.createdAt);
+  if(!list.length){
+    return `<div class="card"><div class="sec-title">📋 我的订单</div>
+      <p class="muted center" style="padding:26px 0;">还没有订单，去点一份好吃的吧～</p>
+      <button class="btn" data-act="go" data-view="home">去点餐</button></div>`;
+  }
+  return `<div style="padding:10px 10px 0;">
+    <div class="sec-title" style="padding:0 4px 8px;">📋 我的订单（${list.length}）</div>
+    ${list.map(o=>{
+      const st=STATUS[o.status]||{t:o.status,c:''};
+      return `<div class="order-card">
+        <div class="oc-head"><span class="oc-id">${o.id}</span><span class="badge ${st.c}">${st.t}</span></div>
+        <div class="row"><span>类型</span><span>${o.type==='food'?'🍚 点餐':'📦 快递代取'}</span></div>
+        ${o.type==='food'
+          ? `<div class="row"><span>食堂</span><span>${esc(o.canteen)}</span></div>
+             <div class="row"><span>饭名</span><span>${esc(o.foodName)}</span></div>
+             <div class="row"><span>饭钱</span><span>${money(o.foodFee)}</span></div>`
+          : `<div class="row"><span>取件码/尾号</span><span>${esc(o.code)}</span></div>`}
+        <div class="row"><span>送达院系</span><span>${esc(o.dept)}</span></div>
+        <div class="row"><span>配送费</span><span>${money(o.deliveryFee)}</span></div>
+        <div class="row total"><span>合计</span><span class="price">${money(o.total)}</span></div>
+        ${o.courier?`<div class="row"><span>配送员</span><span>${esc(o.courier.name)} ${esc(o.courier.phone)}</span></div>`:''}
+        ${o.status==='pending_review'?`<p class="muted" style="margin-top:8px;">⏳ 已付款，等待中控管理员审核…</p>`:''}
+        ${o.status==='rejected'?`<p class="muted" style="margin-top:8px;color:#e34d4d;">❌ 未通过审核，请联系客服 ${esc(D.servicePhone)}</p>`:''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ---------------- 个人中心 ---------------- */
+function viewMe(){
+  const u=cur();
+  return `
+  <div class="profile">
+    <div class="avatar">${esc(u.name.slice(0,1))}</div>
+    <div>
+      <div class="pname">${esc(u.name)} ${u.member?'<span class="tag-member">会员</span>':''}</div>
+      <div class="pphone">📱 ${esc(u.phone)}</div>
+      <div class="pclass">${esc(u.className)} · ${u.age}岁</div>
+    </div>
+  </div>
+
+  <div class="card menu-list">
+    <div class="ml-item" data-act="go" data-view="memberApply">
+      <span>💎 申请会员 (10元/月)</span>
+      <span class="ml-r">${u.member?'已开通':(u.memberPending?'审核中':'去申请')} ›</span></div>
+    <div class="ml-item" data-act="go" data-view="courierApply">
+      <span>🛵 申请配送员</span><span class="ml-r">›</span></div>
+    <div class="ml-item" data-act="go" data-view="courierWork">
+      <span>📋 配送员接单</span><span class="ml-r">›</span></div>
+    <div class="ml-item" data-act="go" data-view="admin">
+      <span>🛠 中控管理</span><span class="ml-r">›</span></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">🎧 客服支持</div>
+    <div class="row"><span>客服电话</span>
+      <a class="link" href="tel:${esc(D.servicePhone)}">${esc(D.servicePhone)}</a></div>
+    
+    <div class="wx-group">
+      <div class="group-avatar">
+        <span>👧</span><span>🐶</span><span>🐱</span><span>👦</span>
+      </div>
+      <div class="group-qr">
+        <img src="kefu.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" alt="客服微信二维码">
+      </div>
+    </div>
+  </div>
+
+  <div class="card"><button class="btn btn-ghost" data-act="logout">退出登录</button></div>`;
+}
+
+/* ---------------- 申请会员 (修改权益文案) ---------------- */
+function viewMemberApply(){
+  const u=cur();
+  
+  const qrHtml = `
+    <div class="pay-card-mock">
+      <div class="mock-wx"><div class="title">微信支付</div></div>
+      <div class="mock-body">
+        <div class="qr-container">
+          <img src="wechat.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" alt="微信收款码">
+        </div>
+      </div>
+    </div>`;
+
+  return `<div class="card">
+    <div class="sec-title">💎 申请会员 (10元/月)</div>
+    <div class="member-card">
+      <div class="mc-title">校闪送 · 校园会员卡</div>
+      <ul class="mc-list">
+        <li>✅ 专属会员身份标识</li>
+        <li>✅ 优先配送</li>
+        <li>✅ 配送费减半</li>
+      </ul>
+    </div>
+    
+    ${u.member ? `
+      <div class="alert ok" style="text-align:center;font-size:15px;font-weight:700;">您已是尊贵的会员 ✅</div>
+    ` : (u.memberPending ? `
+      <div class="alert warn" style="text-align:center;font-size:15px;font-weight:700;">会员申请审核中，请等待中控管理员确认 ⏳</div>
+    ` : `
+      <div class="alert" style="text-align:center;">
+        <div style="font-size:16px;font-weight:800;color:#ff5000;">开通费用：¥10.00 / 月</div>
+        <p class="muted" style="margin-top:6px;">请扫码支付后点击下方提交，中控管理员确认收款后为您开通。</p>
+      </div>
+      
+      ${qrHtml}
+      
+      <button class="btn" style="margin-top:10px;" data-act="member-pay-submit">我已付款，提交审核</button>
+    `)}
+  </div>`;
+}
+
+/* ---------------- 申请配送员 ---------------- */
+function viewCourierApply(){
+  const u=cur();
+  const myApp = D.couriers.filter(c=>c.phone===u.phone).sort((a,b)=>b.createdAt-a.createdAt)[0];
+  return `<div class="card">
+    <div class="sec-title">🛵 申请成为配送员</div>
+    <p class="muted">提交申请后需等待 <b>中控管理员审核</b>，审核通过后即可使用接单功能。</p>
+    ${myApp?`<div class="alert ${myApp.status==='approved'?'ok':(myApp.status==='pending'?'warn':'bad')}">
+      当前申请状态：${myApp.status==='approved'?'已通过 ✅':(myApp.status==='pending'?'审核中 ⏳':'未通过 ❌')}
+    </div>`:''}
+    <div class="field"><label>姓名 *</label><input id="ca-name" placeholder="请输入姓名"></div>
+    <div class="field"><label>电话号码 *</label><input id="ca-phone" type="tel" maxlength="11" placeholder="请输入手机号"></div>
+    <div class="field"><label>班级 *</label><input id="ca-class" placeholder="如：机电2101"></div>
+    <button class="btn" data-act="courier-apply">提交申请</button>
+  </div>`;
+}
+
+/* ---------------- 配送员接单 ---------------- */
+function viewCourierWork(){
+  if(!D.courierSession){
+    return `<div class="card">
+      <div class="sec-title">🛵 配送员接单登录</div>
+      <p class="muted">需为已通过中控审核的配送员，并输入接单密码。</p>
+      <div class="field"><label>姓名 *</label><input id="cw-name" placeholder="请输入配送员姓名"></div>
+      <div class="field"><label>联系电话 *</label><input id="cw-phone" type="tel" maxlength="11" placeholder="请输入联系电话"></div>
+      <div class="field"><label>接单密码 *</label><input id="cw-pwd" type="password" placeholder="请输入接单密码"></div>
+      <button class="btn" data-act="courier-login">登录接单</button>
+      <p class="muted center" style="margin-top:12px;font-size:12px;">接单密码由中控管理员设置</p>
+    </div>`;
+  }
+  const me = D.courierSession;
+  const avail = D.orders.filter(o=>o.status==='approved');
+  const mine  = D.orders.filter(o=>o.courier && o.courier.phone===me.phone && o.status==='delivering');
+  const done  = D.orders.filter(o=>o.courier && o.courier.phone===me.phone && o.status==='done');
+
+  const card = o=>{
+    const st=STATUS[o.status]||{t:o.status,c:''};
+    return `<div class="order-card">
+      <div class="oc-head"><span class="oc-id">${o.id}</span><span class="badge ${st.c}">${st.t}</span></div>
+      <div class="row"><span>类型</span><span>${o.type==='food'?'🍚 点餐':'📦 快递代取'}</span></div>
+      ${o.type==='food'
+        ? `<div class="row"><span>食堂</span><span>${esc(o.canteen)}</span></div>
+           <div class="row"><span>饭名</span><span>${esc(o.foodName)}</span></div>
+           <div class="row"><span>饭钱</span><span>${money(o.foodFee)}</span></div>`
+        : `<div class="row"><span>取件码/尾号</span><span>${esc(o.code)}</span></div>${o.note?`<div class="row"><span>备注</span><span>${esc(o.note)}</span></div>`:''}`}
+      <div class="row"><span>送达院系</span><span>${esc(o.dept)}</span></div>
+      <div class="row"><span>下单人</span><span>${esc(o.userName)} ${esc(o.phone)}</span></div>
+      <div class="row total"><span>配送费</span><span class="price">${money(o.deliveryFee)}</span></div>
+      ${o.status==='approved'?`<div class="oc-actions"><button class="btn btn-sm" data-act="take-order" data-oid="${o.id}">立即接单</button></div>`:''}
+      ${o.status==='delivering'?`<div class="oc-actions"><button class="btn btn-sm" data-act="finish-order" data-oid="${o.id}">确认送达</button></div>`:''}
+    </div>`;
+  };
+
+  return `
+  <div class="card">
+    <div class="sec-title">🛵 配送员工作台</div>
+    <div class="row"><span>当前配送员</span><span>${esc(me.name)}（${esc(me.phone)}）</span></div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:10px" data-act="courier-logout">退出接单</button>
+  </div>
+
+  <div style="padding:0 10px;">
+    <div class="sec-title" style="padding:6px 4px;">🟢 可接订单（${avail.length}）</div>
+    ${avail.length? avail.map(card).join('') : `<div class="card"><p class="muted center">暂无审核通过的订单</p></div>`}
+
+    <div class="sec-title" style="padding:10px 4px 6px;">🚀 我的配送中（${mine.length}）</div>
+    ${mine.length? mine.map(card).join('') : `<div class="card"><p class="muted center">暂无进行中的配送</p></div>`}
+
+    <div class="sec-title" style="padding:10px 4px 6px;">✅ 历史完成（${done.length}）</div>
+    ${done.length? done.slice(0,5).map(card).join('') : `<div class="card"><p class="muted center">暂无历史记录</p></div>`}
+  </div>`;
+}
+
+/* ---------------- 中控后台 ---------------- */
+const ADMIN_TABS = [['review','订单审核'],['courier','配送员'],['member','会员'],['price','价格/密码'],['site','站点设置']];
+
+function viewAdmin(){
+  if(!ui.adminAuthed){
+    return `<div class="card">
+      <div class="sec-title">🛠 中控管理登录</div>
+      <p class="muted">请输入中控管理员密码进入后台</p>
+      <div class="field"><label>中控密码</label>
+        <input id="adm-pwd" type="password" placeholder="请输入中控密码"></div>
+      <button class="btn" data-act="admin-login">进入中控</button>
+      <p class="muted center" style="margin-top:12px;font-size:12px;">如忘记密码请联系平台负责人</p>
+    </div>`;
+  }
+  const tab = ui.adminTab || 'review';
+  let content='';
+  if(tab==='review') content = adminReview();
+  else if(tab==='courier') content = adminCourier();
+  else if(tab==='member') content = adminMember();
+  else if(tab==='price') content = adminPricePwd();
+  else content = adminSite();
+
+  return `<div class="card">
+      <div class="admin-head"><span>🛠 中控管理后台</span>
+        <button class="btn btn-sm btn-ghost" data-act="admin-logout">退出</button></div>
+    </div>
+    <div class="tabs">
+      ${ADMIN_TABS.map(([k,v])=>`<div class="tab ${tab===k?'active':''}" data-act="admintab" data-tab="${k}">${v}</div>`).join('')}
+    </div>
+    ${content}`;
+}
+
+function adminReview(){
+  const list = [...D.orders].sort((a,b)=>b.createdAt-a.createdAt);
+  const pending = list.filter(o=>o.status==='pending_review').length;
+  if(!list.length) return `<div class="card"><p class="muted center">暂无订单</p></div>`;
+  return `<div class="card">
+    <div class="sec-title">📋 全部订单（${list.length}） · 待审核 ${pending}</div>
+    <p class="muted">所有已付款订单均需中控人工审核通过后，配送员才可接单。</p>
+  </div>
+  <div style="padding:0 10px 10px;">
+  ${list.map(o=>{
+    const st=STATUS[o.status]||{t:o.status,c:''};
+    return `<div class="order-card">
+      <div class="oc-head"><span class="oc-id">${o.id}</span><span class="badge ${st.c}">${st.t}</span></div>
+      <div class="row"><span>类型</span><span>${o.type==='food'?'🍚 点餐':'📦 快递代取'}</span></div>
+      ${o.type==='food'
+        ? `<div class="row"><span>食堂</span><span>${esc(o.canteen)}</span></div>
+           <div class="row"><span>饭名</span><span>${esc(o.foodName)}</span></div>
+           <div class="row"><span>饭钱</span><span>${money(o.foodFee)}</span></div>`
+        : `<div class="row"><span>取件码/尾号</span><span>${esc(o.code)}</span></div>${o.note?`<div class="row"><span>备注</span><span>${esc(o.note)}</span></div>`:''}`}
+      <div class="row"><span>下单人</span><span>${esc(o.userName)} ${esc(o.phone)}</span></div>
+      <div class="row"><span>送达院系</span><span>${esc(o.dept)}</span></div>
+      <div class="row"><span>配送费</span><span>${money(o.deliveryFee)}</span></div>
+      <div class="row total"><span>实付合计</span><span class="price">${money(o.total)}</span></div>
+      ${o.courier?`<div class="row"><span>配送员</span><span>${esc(o.courier.name)} ${esc(o.courier.phone)}</span></div>`:''}
+      ${o.status==='pending_review'?`<div class="oc-actions">
+        <button class="btn btn-sm" data-act="adm-pass-order" data-oid="${o.id}">审核通过</button>
+        <button class="btn btn-sm btn-ghost" data-act="adm-reject-order" data-oid="${o.id}">驳回</button>
+      </div>`:''}
+    </div>`;
+  }).join('')}
+  </div>`;
+}
+
+function adminCourier(){
+  const list=[...D.couriers].sort((a,b)=>b.createdAt-a.createdAt);
+  if(!list.length) return `<div class="card"><p class="muted center">暂无配送员申请</p></div>`;
+  return `<div style="padding:0 10px 10px;">
+  ${list.map(c=>{
+    const map={pending:['审核中','warn'],approved:['已通过','ok'],rejected:['未通过','bad']};
+    const [t,cls]=map[c.status]||['未知',''];
+    return `<div class="order-card">
+      <div class="oc-head"><span class="oc-id">配送员申请</span><span class="badge ${cls}">${t}</span></div>
+      <div class="row"><span>姓名</span><span>${esc(c.name)}</span></div>
+      <div class="row"><span>电话</span><span>${esc(c.phone)}</span></div>
+      <div class="row"><span>班级</span><span>${esc(c.className)}</span></div>
+      ${c.status==='pending'?`<div class="oc-actions">
+        <button class="btn btn-sm" data-act="adm-pass-courier" data-cid="${c.id}">通过</button>
+        <button class="btn btn-sm btn-ghost" data-act="adm-reject-courier" data-cid="${c.id}">拒绝</button>
+      </div>`:''}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function adminMember(){
+  const list = D.users.filter(u=>u.memberPending);
+  const members = D.users.filter(u=>u.member);
+  return `<div class="card">
+    <div class="sec-title">💎 会员申请（待审核 ${list.length}）</div>
+    <p class="muted">确认用户已支付10元会员费后，点击通过。</p>
+    ${list.length? list.map(u=>`<div class="order-card">
+        <div class="row"><span>姓名</span><span>${esc(u.name)}</span></div>
+        <div class="row"><span>手机号</span><span>${esc(u.phone)}</span></div>
+        <div class="row"><span>班级</span><span>${esc(u.className)}</span></div>
+        <div class="oc-actions">
+          <button class="btn btn-sm" data-act="adm-pass-member" data-phone="${esc(u.phone)}">审核通过 (开通30天)</button>
+          <button class="btn btn-sm btn-ghost" data-act="adm-reject-member" data-phone="${esc(u.phone)}">驳回</button>
+        </div>
+      </div>`).join('') : `<p class="muted center">暂无待审核会员申请</p>`}
+  </div>
+  <div class="card">
+    <div class="sec-title">已开通会员（${members.length}）</div>
+    ${members.length? members.map(u=>`<div class="row"><span>${esc(u.name)} · ${esc(u.phone)}</span><span>${esc(u.className)}</span></div>`).join('')
+      : `<p class="muted center">暂无会员</p>`}
+  </div>`;
+}
+
+function adminPricePwd(){
+  return `<div class="card">
+    <div class="sec-title">💰 配送价格设置（元）</div>
+    ${DEPTS.map(d=>`<div class="field"><label>${d}</label>
+      <input id="price-${d}" type="number" step="0.1" min="0" value="${D.prices[d]}"></div>`).join('')}
+    <button class="btn" data-act="save-prices">保存价格</button>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">🔑 密码设置</div>
+    <div class="field"><label>中控管理密码</label>
+      <input id="pwd-admin" type="text" value="${esc(D.adminPwd)}" placeholder="请输入新的中控密码"></div>
+    <div class="field"><label>配送员接单密码</label>
+      <input id="pwd-courier" type="text" value="${esc(D.courierPwd)}" placeholder="请输入新的接单密码"></div>
+    <button class="btn" data-act="save-pwds">保存密码</button>
+  </div>`;
+}
+
+function adminSite(){
+  return `<div class="card">
+    <div class="sec-title">⚙️ 站点设置</div>
+    <div class="field"><label>网站名称</label>
+      <input id="site-name" value="${esc(D.siteName)}" placeholder="如：校闪送"></div>
+    <div class="field"><label>客服电话</label>
+      <input id="site-phone" type="tel" value="${esc(D.servicePhone)}" placeholder="请输入客服电话"></div>
+    <button class="btn" data-act="save-site">保存设置</button>
+    <p class="muted center" style="margin-top:12px;">修改后网站顶部名称与客服电话将同步更新</p>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">👥 注册用户（${D.users.length}）</div>
+    ${D.users.map(u=>`<div class="row"><span>${esc(u.name)} · ${esc(u.phone)}</span>
+      <span>${esc(u.className)}</span></div>`).join('')}
+  </div>`;
+}
+
+/* =========================================================
+   事件处理
+========================================================= */
+document.getElementById('app').addEventListener('click', function(e){
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const act = el.dataset.act;
+  const ds = el.dataset;
+  handle(act, ds, el);
+});
+
+// 监听输入饭名和饭钱
+document.getElementById('app').addEventListener('input', function(e){
+  if(e.target.id === 'food-name'){
+    ui.foodName = e.target.value;
+  }
+  if(e.target.id === 'food-price'){
+    ui.foodPrice = e.target.value;
+    const u = cur();
+    if(u && ui.view === 'home'){
+      const baseFee = D.prices[ui.dept] ?? 2;
+      const fee = u.member ? baseFee / 2 : baseFee;
+      const fp = parseFloat(ui.foodPrice) || 0;
+      const total = fp + fee;
+      let cartbar = document.querySelector('.cartbar');
+      if (fp > 0) {
+        if (!cartbar) {
+          cartbar = document.createElement('div');
+          cartbar.className = 'cartbar';
+          document.getElementById('app').appendChild(cartbar);
+        }
+        cartbar.innerHTML = `<div class="cartbar-inner">
+          <div>饭钱 <b>${money(fp)}</b> <span style="opacity:.65;font-size:12px;"> + 配送${money(fee)}</span></div>
+          <button class="btn btn-sm" data-act="tocheckout">去支付 ${money(total)}</button>
+        </div>`;
+      } else {
+        if (cartbar) cartbar.remove();
+      }
+    }
+  }
+});
+
+function handle(act, ds){
+  switch(act){
+
+    /* ---- 登录/注册 ---- */
+    case 'switch-auth':
+      ui.authMode = ds.mode;
+      render();
+      break;
+
+    case 'login': {
+      const phone = val('l-phone');
+      if(!/^1\d{10}$/.test(phone)) return toast('请输入正确的11位手机号');
+      const u = D.users.find(x=>x.phone===phone);
+      if(!u) return toast('该手机号未注册，请先切换至注册页面');
+      D.currentPhone = phone;
+      save(); ui.view='home'; render();
+      toast('欢迎回来，' + u.name);
+      break;
+    }
+
+    case 'register': {
+      const phone=val('r-phone'), name=val('r-name'), age=val('r-age'), cls=val('r-class');
+      if(!/^1\d{10}$/.test(phone)) return toast('请输入正确的11位手机号');
+      if(!name) return toast('请输入姓名');
+      if(!age || +age<=0 || +age>120) return toast('请输入正确的年龄');
+      if(!cls) return toast('请输入班级');
+      if(D.users.some(x=>x.phone===phone)) return toast('该手机号已注册，请直接登录');
+      
+      let u = {phone, name, age:+age, className:cls, member:false, memberPending:false, createdAt:Date.now()};
+      D.users.push(u);
+      D.currentPhone = phone;
+      save(); ui.view='home'; render();
+      toast('注册成功，欢迎使用 ' + D.siteName);
+      break;
+    }
+
+    /* ---- 导航 ---- */
+    case 'go':
+      ui.view = ds.view; 
+      if (ui.view === 'home') {
+        ui.foodName = '';
+        ui.foodPrice = '';
+      }
+      render(); break;
+
+    case 'logout':
+      if(!confirm('确定退出当前账号吗？')) return;
+      D.currentPhone=''; ui.draft=null; ui.foodName=''; ui.foodPrice=''; ui.view='home';
+      save(); render(); break;
+
+    /* ---- 首页 / 点餐 ---- */
+    case 'setdept':
+      ui.dept = ds.dept; render(); break;
+
+    case 'setcanteen':
+      ui.canteen = ds.canteen; render(); break;
+
+    case 'tocheckout': {
+      const fp = parseFloat(ui.foodPrice) || 0;
+      const fn = (ui.foodName || '').trim();
+      if(!fn) return toast('请填写饭名/菜品');
+      if(fp <= 0) return toast('请输入正确的饭钱');
+      
+      const u = cur();
+      const baseFee = Number(D.prices[ui.dept]) || 0;
+      const deliveryFee = u.member ? baseFee / 2 : baseFee;
+      
+      ui.draft = {
+        id: 'D'+Date.now()+Math.floor(Math.random()*900+100),
+        type:'food', canteen:ui.canteen, foodName:fn, foodFee:fp, dept:ui.dept, deliveryFee,
+        total: +(fp + deliveryFee).toFixed(2)
+      };
+      ui.view='checkout'; render(); break;
+    }
+
+    /* ---- 快递 ---- */
+    case 'express-submit': {
+      const code = val('ex-code'), note = val('ex-note');
+      if(!code) return toast('请填写取件码或手机尾号');
+      
+      const u = cur();
+      const baseFee = Number(D.prices[ui.dept]) || 0;
+      const deliveryFee = u.member ? baseFee / 2 : baseFee;
+      
+      ui.draft = {
+        id: 'D'+Date.now()+Math.floor(Math.random()*900+100),
+        type:'express', code, note, dept:ui.dept, foodFee:0,
+        deliveryFee, total: deliveryFee
+      };
+      ui.view='checkout'; render(); break;
+    }
+
+    /* ---- 付款提交 (点餐/快递) ---- */
+    case 'paid': {
+      const d = ui.draft;
+      if(!d) return toast('订单信息已失效，请重新下单');
+      const u = cur();
+      const order = {
+        id: 'XSD' + String(Date.now()).slice(-8) + Math.floor(Math.random()*90+10),
+        type: d.type,
+        phone: u.phone, userName: u.name, userClass: u.className,
+        canteen: d.canteen || '', foodName: d.foodName || '', code: d.code || '', note: d.note || '',
+        dept: d.dept, foodFee: d.foodFee || 0,
+        deliveryFee: d.deliveryFee, total: d.total,
+        status: 'pending_review',
+        createdAt: Date.now(), courier: null
+      };
+      D.orders.push(order);
+      ui.draft = null; ui.foodPrice = ''; ui.foodName = '';
+      save(); ui.view='orders'; render();
+      toast('已提交，等待中控审核');
+      break;
+    }
+
+    /* ---- 会员 ---- */
+    case 'member-pay-submit': {
+      const u = cur();
+      if(u.member) return toast('您已经是会员了');
+      if(u.memberPending) return toast('申请审核中，请耐心等待');
+      u.memberPending = true; 
+      save(); render();
+      toast('会员申请已提交，等待中控审核');
+      break;
+    }
+    case 'adm-pass-member': {
+      const u = D.users.find(x=>x.phone===ds.phone);
+      if(u){ 
+        u.member=true; 
+        u.memberPending=false; 
+        u.memberExpire = Date.now() + 30*24*60*60*1000; 
+        save(); render(); toast('已开通会员（30天）'); 
+      }
+      break;
+    }
+    case 'adm-reject-member': {
+      const u = D.users.find(x=>x.phone===ds.phone);
+      if(u){ u.memberPending=false; save(); render(); toast('已驳回申请'); }
+      break;
+    }
+
+    /* ---- 配送员申请 ---- */
+    case 'courier-apply': {
+      const name=val('ca-name'), phone=val('ca-phone'), cls=val('ca-class');
+      if(!name) return toast('请输入姓名');
+      if(!/^1\d{10}$/.test(phone)) return toast('请输入正确的联系电话');
+      if(!cls) return toast('请输入班级');
+      if(D.couriers.some(c=>c.phone===phone && c.status==='pending')) return toast('已有待审核的申请');
+      D.couriers.push({id:'C'+Date.now(), name, phone, className:cls, status:'pending', createdAt:Date.now()});
+      save(); render(); toast('申请已提交，等待中控审核');
+      break;
+    }
+    case 'adm-pass-courier': {
+      const c = D.couriers.find(x=>x.id===ds.cid);
+      if(c){ c.status='approved'; save(); render(); toast('已通过配送员申请'); }
+      break;
+    }
+    case 'adm-reject-courier': {
+      const c = D.couriers.find(x=>x.id===ds.cid);
+      if(c){ c.status='rejected'; save(); render(); toast('已拒绝该申请'); }
+      break;
+    }
+
+    /* ---- 配送员接单 ---- */
+    case 'courier-login': {
+      const name=val('cw-name'), phone=val('cw-phone'), pwd=val('cw-pwd');
+      if(!name) return toast('请输入姓名');
+      if(!/^1\d{10}$/.test(phone)) return toast('请输入正确的联系电话');
+      if(!pwd) return toast('请输入接单密码');
+      if(pwd !== D.courierPwd) return toast('接单密码错误');
+      const c = D.couriers.find(x=>x.name===name && x.phone===phone);
+      if(!c) return toast('未找到配送员信息，请先申请');
+      if(c.status==='pending') return toast('申请正在审核中，请耐心等待');
+      if(c.status!=='approved') return toast('申请未通过，请联系中控管理员');
+      D.courierSession = {name:c.name, phone:c.phone};
+      save(); render(); toast('登录成功，开始接单吧！');
+      break;
+    }
+    case 'courier-logout':
+      D.courierSession = null; save(); render(); break;
+
+    case 'take-order': {
+      const o = D.orders.find(x=>x.id===ds.oid);
+      if(!o) return;
+      if(o.status!=='approved') return toast('该订单暂不可接单');
+      o.status='delivering';
+      o.courier = {...D.courierSession};
+      o.takenAt = Date.now();
+      save(); render(); toast('接单成功，请尽快配送');
+      break;
+    }
+    case 'finish-order': {
+      const o = D.orders.find(x=>x.id===ds.oid);
+      if(!o) return;
+      o.status='done'; o.doneAt=Date.now();
+      save(); render(); toast('订单已送达，辛苦了！');
+      break;
+    }
+
+    /* ---- 中控 ---- */
+    case 'admin-login': {
+      const pwd = val('adm-pwd');
+      if(!pwd) return toast('请输入中控密码');
+      if(pwd !== D.adminPwd) return toast('中控密码错误');
+      ui.adminAuthed = true; ui.adminTab='review'; render();
+      toast('已进入中控后台');
+      break;
+    }
+    case 'admin-logout':
+      ui.adminAuthed = false; render(); break;
+
+    case 'admintab':
+      ui.adminTab = ds.tab; render(); break;
+
+    case 'adm-pass-order': {
+      const o = D.orders.find(x=>x.id===ds.oid);
+      if(o){ o.status='approved'; o.reviewedAt=Date.now(); save(); render(); toast('订单已通过审核'); }
+      break;
+    }
+    case 'adm-reject-order': {
+      const o = D.orders.find(x=>x.id===ds.oid);
+      if(o){ o.status='rejected'; o.reviewedAt=Date.now(); save(); render(); toast('订单已驳回'); }
+      break;
+    }
+
+    case 'save-prices': {
+      let ok=false;
+      DEPTS.forEach(d=>{
+        const inp = document.getElementById('price-'+d);
+        if(inp){
+          const v = parseFloat(inp.value);
+          if(!isNaN(v) && v>=0){ D.prices[d] = +v.toFixed(2); ok=true; }
+        }
+      });
+      save(); render();
+      toast(ok ? '配送价格已更新' : '请输入有效价格');
+      break;
+    }
+
+    case 'save-pwds': {
+      const a = val('pwd-admin'), c = val('pwd-courier');
+      if(a){ if(a.length<4) return toast('中控密码至少4位'); D.adminPwd=a; }
+      if(c){ if(c.length<4) return toast('接单密码至少4位'); D.courierPwd=c; }
+      save(); render(); toast('密码已更新');
+      break;
+    }
+
+    case 'save-site': {
+      const n = val('site-name'), p = val('site-phone');
+      if(n) D.siteName = n;
+      if(p) D.servicePhone = p;
+      save(); render(); toast('站点设置已保存');
+      break;
+    }
+
+    default: break;
+  }
+}
+
+/* =========================================================
+   启动
+========================================================= */
+render();
+</script>
+</body>
+</html>
